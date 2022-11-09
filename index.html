@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Testing</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+
+<body>
+    <button id="btn-begin">Inicia el Combate</button>
+    <div class="container">
+        <div class="char-containers">
+            <div class="ch" id="ch1">
+                <img alt="" src="./resources/img/Abby.webp" width="150">
+                <div class="name">
+                </div>
+                <div class="hp">
+                </div>
+            </div>
+
+            <div class="ch" id="ch2">
+                <img alt="" src="./resources/img/Ybba.webp" width="150">
+                <div class="name" class="ch2">
+                </div>
+                <div class="hp" class="ch2">
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="btn-attack">Atacar</button>
+        </div>
+
+        <textarea name="combat-log" class="combat-log" readonly id="cLog" cols="30" rows="10"></textarea>
+    </div>
+    <audio class="audio">
+        <source src="./resources/audio/au_fight.mp3">
+    </audio>
+    <script src="./app.js"></script>
+</body>
+
+</html>
