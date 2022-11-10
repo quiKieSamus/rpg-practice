@@ -14,9 +14,20 @@ class Character {
     }
 
     //heal character, healed param is the one receiving the healing
-    heal(healed) {
-        healed.hp += 30;
-        return healed.hp;
+    heal(ch = this) {
+        const currentHealth = this.hp;
+        if (this.hp + 30 >= this.hpOrigin) {
+            if (this.hp === this.hpOrigin) {
+                Display.updateCombatLog("Your hp is at its top");
+            }
+            const hpHealed = this.hp + 30 - currentHealth;     
+            this.hp = this.hp + 30 - currentHealth;
+            Display.updateCombatLog(`${this.name} heals for ${hpHealed} points`);
+        } else {
+            this.hp += 30;
+        }
+        
+        return this.hp;
     }
 
     resetStatsToOrigin(ch = this) {
@@ -153,3 +164,8 @@ const btnAttack = document.getElementById("btn-attack");
 btnAttack.addEventListener("click", () => {
     combat.doTurn();
 });
+
+const btnHeal = document.getElementById("btn-heal");
+btnHeal.addEventListener("click", () => {
+    ch2.heal();
+})
