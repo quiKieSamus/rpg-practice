@@ -1,5 +1,30 @@
-class Character {
-    constructor(id, name, hp, atk, def, sp, sprite) {
+class Character { /*
+    Character class: The character class contains everything that concerns about each specific character in the combat system. These could be the player or the enemy computer. 
+
+    As in any rpg game, each character has a set of stats that will take effect once combat begins. These stats are:
+
+        1.- ID: an identifier for each character (As of now, there is no use for this stat but it might come handy in the future).
+        2.- Name: Name of the character that will be displayed.
+        3.- hp: Health Points. Once they reach a value of 0 or less, character faints.
+        4.- atk: Attack Points. The sheer force of the character, higher means heavier, more powerful attacks. It is decreased by enemy defense points (def)
+        5.- def: Defence Points. The resilience of the character, higher means the character can withstand more hits while taking less damage. 
+        6.- sp: Speed Points. The character's agility. The one character that has the higher speed will act first.
+    
+    Now, there are some extra stats which end with the word origin, these stats don't actually interact in combat but serve the purpose of restoring to origin, when battle is over, any stat that was changed during combat be it by a move that could decrease defence or attack (these are just examples to explain the concept in discussion) or anything else that could change a character stat.
+
+    When it comes to the methods that the character class has, we can talk about a few that might be self explanatory:
+        1.- Attack method: receives the parameter of target. This method attacks a target character instance (an enemy) while in combat.
+        2.- Defend method: Increases the character defence for the next turn by 50%. Good when expecting high damage output.
+        3.- Heal method: Heals a charater by 30 points.
+    
+    The resetStatsToOrigin Method which is not completed should serve the purpose of setting each stats to its origin status (These was discussed previously in this comment).
+
+    To add:
+
+        1.- Mana or Energy Stats that avoids the overuse (spam) of special techniques such as the heal method.
+
+*/
+    constructor(id, name, hp, atk, def, mana, sp) {
         this.id = id;
         this.name = name;
         this.hp = hp;
@@ -8,21 +33,22 @@ class Character {
         this.atkOrigin = this.atk;
         this.def = def;
         this.defOrigin = this.def;
+        this.mana = mana;
+        this.manaOrigin = this.mana;
         this.sp = sp;
         this.spOrigin = this.sp;
-        this.sprite = sprite;
     }
 
     attack(target) {
         const gamble = Math.random();
         const damage = Math.round((this.atk + (this.atk * Math.random()))) - target.def;
         let damageDone;
-        if (gamble > 0.7) {
+        if (gamble > 0.9) {
             const critHit = damage * 3;
             damageDone = target.hp - critHit;
             target.hp = damageDone;
             Display.updateCombatLog(`IT WAS A CRITICAL HIT ${this.name}!!!! ${critHit} points of damage were dealt`);
-            Display.attack(true);    
+            Display.attack(true);
             return critHit;
         }
         damageDone = target.hp - damage;
@@ -39,20 +65,38 @@ class Character {
 
     //heal character, healed param is the one receiving the healing
     heal() {
-        let heal = 30;
-        this.hp += heal;
-        Display.heal();
-        Display.updateCombatLog(`${this.name} Healed for ${heal} points`);
+        if (this.mana < 30) {
+            if (this.name === "Abby") {
+                Display.updateCombatLog("I don't have enough mp, therefore I will attack you Ybba");
+                this.attack(ch2);
+                return ch2.hp;
+            }
+            Display.updateCombatLog(`${this.name}, you don't have enough MP for that move`);
+        } else {
+            let heal = 30;
+            this.hp += heal;
+            this.mana -= 30;
+            Display.heal();
+            Display.updateCombatLog(`${this.name} Healed for ${heal} points`);
+        }
+
         return this.hp;
     }
 
-    resetStatsToOrigin(ch = this) {
-        ch.hp = ch.hpOrigin;
+    resetOneTurnEffectStatsToOrigin() {
+        this.def = this.defOrigin;
+    }
+
+    resetStatsToOrigin() {
+        this.hp = ch.hpOrigin;
         return ch.hp;
     }
 }
 
 class CombatSystem {
+    /*
+    The CombatSystem Class has control over what happens in the battle, who can make a move and who can't. It's kind of like the referee who checks that everything is going fine for the participants involved in the combat. It isn't perfect but it's functional. It knows when someone wins or loses, has data on the amount of turns that has passed and when the combat is over. Each combat that could occur in the game will create a new CombatSystem instance. Each instance has a p1 (participant 1) and a p2 (participant 2).
+    */
     constructor(p1, p2) {
         this.p1 = p1;
         this.p2 = p2;
@@ -75,30 +119,27 @@ class CombatSystem {
     beginCombat() {
         this.status = 1;
         this.increaseTurn();
-        Display.updateCombatLog("combat has begun");
+        Display.updateCombatLog("Combat has begun");
+        return this.status;
     }
     //method to make a turn
     doTurn(atkr, dfndr, op) {
         this.winChek();
         if (this.status === 1) {
-            if (this.p1Move === false && this.p2Move === false) {
-                this.increaseTurn();
-                this.p1Move = true;
-                this.p2Move = true;
-                return [this.p1Move, this.p2Move];
-            } else {
-                switch (op) {
-                    case 'atk':
-                        atkr.attack(dfndr);
-                        break;
-                    case 'heal':
-                        atkr.heal();
-                        break;
-                }
-
-                Display.updateCombatStats();
-
+            switch (op) {
+                case 'atk':
+                    atkr.attack(dfndr);
+                    break;
+                case 'heal':
+                    atkr.heal();
+                    break;
+                case 'def':
+                    atkr.defend();
+                    break;
             }
+
+            Display.updateCombatStats();
+
         } else {
             Display.updateCombatLog("Combat is over");
             Display.hideControls(true);
@@ -117,6 +158,7 @@ class CombatSystem {
         if (this.p2.hp <= 0) {
             Display.updateCombatLog(`Winner is ${this.p1.name}`);
             Sound.playGameOverMusic();
+            Display.updateCombatLog(`Game Over`);
             this.status = 0;
         }
     }
@@ -142,17 +184,19 @@ class CombatSystem {
 }
 
 class Display {
+
     static updateCombatStats() {
         for (let i = 0; i < document.querySelectorAll(".ch").length; i++) {
             const charContainers = document.querySelectorAll(".ch");
             charContainers[i].children[1].innerHTML = `${i === 0 ? ch1.name : ch2.name}`;
             charContainers[i].children[2].innerHTML = `${i === 0 ? ch1.hp : ch2.hp}/${i === 0 ? ch1.hpOrigin : ch2.hpOrigin}HP`;
+            charContainers[i].children[3].innerHTML = `${i === 0 ? ch1.mana : ch2.mana}/${i === 0 ? ch1.manaOrigin : ch2.manaOrigin}MP`;
         }
     }
 
     static updateCombatLog(log) {
         const combatLog = document.querySelector(".combat-log");
-        combatLog.value += log + "\n";
+        combatLog.innerHTML += log + `\n`;
     }
 
     static attack(isCrit) {
@@ -227,7 +271,7 @@ class Sound {
         this.getAudio().load();
     }
     static playSound() {
-        this.getAudio().play(); 
+        this.getAudio().play();
     }
 
     static stopSound() {
@@ -256,8 +300,8 @@ class Sound {
     }
 }
 
-const ch1 = new Character(0, "Abby", 30, 5, 3, 10);
-const ch2 = new Character(1, "Ybba", 35, 6, 2, 5);
+const ch1 = new Character(0, "Abby", 30, 5, 3, 100, 10);
+const ch2 = new Character(1, "Ybba", 35, 6, 2, 70, 5);
 document.querySelector(".combat-log").style.display = "none"
 const combat = new CombatSystem(ch1, ch2);
 
@@ -290,6 +334,25 @@ btnHeal.addEventListener("click", () => {
     combat.doTurn(ch2, ch1, op);
     Display.hideControls();
 })
+
+const btnDefend = document.getElementById("btn-defend");
+btnDefend.addEventListener("click", () => {
+    const op = "def";
+    combat.doTurn(ch2, ch1, op);
+    Display.hideControls();
+
+});
+
+const btnStats = document.getElementById("btn-stats");
+btnStats.addEventListener("click", () => {
+    const statsContainer = document.querySelector(".stats").children;
+    for (let i = 0; i < statsContainer.length; i++) {
+        statsContainer[0].innerHTML = `Attack:${ch2.atk}`;
+        statsContainer[1].innerHTML = `Defence: ${ch2.def}`;
+        statsContainer[2].innerHTML = `Mana: ${ch2.mana}`;
+        statsContainer[3].innerHTML = `Speed: ${ch2.sp}`;
+    }
+});
 
 const btnNext = document.getElementById("btn-next");
 btnNext.addEventListener("click", () => {
