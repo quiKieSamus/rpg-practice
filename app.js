@@ -13,20 +13,36 @@ class Character {
         this.sprite = sprite;
     }
 
-    //heal character, healed param is the one receiving the healing
-    heal(ch = this) {
-        const currentHealth = this.hp;
-        if (this.hp + 30 >= this.hpOrigin) {
-            if (this.hp === this.hpOrigin) {
-                Display.updateCombatLog("Your hp is at its top");
-            }
-            const hpHealed = this.hp + 30 - currentHealth;     
-            this.hp = this.hp + 30 - currentHealth;
-            Display.updateCombatLog(`${this.name} heals for ${hpHealed} points`);
-        } else {
-            this.hp += 30;
+    attack(target) {
+        const gamble = Math.random();
+        const damage = Math.round((this.atk + (this.atk * Math.random()))) - target.def;
+        let damageDone;
+        if (gamble > 0.7) {
+            const critHit = damage * 3;
+            damageDone = target.hp - critHit;
+            target.hp = damageDone;
+            Display.updateCombatLog(`IT WAS A CRITICAL HIT ${this.name}!!!! ${critHit} points of damage were dealt`);
+            Display.attack(true);    
+            return critHit;
         }
-        
+        damageDone = target.hp - damage;
+        target.hp = damageDone;
+        Display.attack();
+        Display.updateCombatLog(`${this.name} attacks ${target.name} dealing ${damage} points of damage`);
+        return damage;
+    }
+
+    defend() {
+        this.def = this.def + (this.def * 0.5);
+        return this.def;
+    }
+
+    //heal character, healed param is the one receiving the healing
+    heal() {
+        let heal = 30;
+        this.hp += heal;
+        Display.heal();
+        Display.updateCombatLog(`${this.name} Healed for ${heal} points`);
         return this.hp;
     }
 
@@ -37,10 +53,12 @@ class Character {
 }
 
 class CombatSystem {
-    constructor(atkr, dfndr) {
-        this.atkr = atkr;
-        this.dfndr = dfndr;
+    constructor(p1, p2) {
+        this.p1 = p1;
+        this.p2 = p2;
         this.turns = 0;
+        this.p1Move = true;
+        this.p2Move = true;
         this.status; //0 is combat finished, 1 is combat in progress
     }
 
@@ -60,48 +78,71 @@ class CombatSystem {
         Display.updateCombatLog("combat has begun");
     }
     //method to make a turn
-    doTurn(atkr = this.atkr, dfndr = this.dfndr) {
-        if (this.turns === 0) {
-            this.beginCombat();
-        } else {
-            const win = this.winCheck();
-            if (win === true) {
-                Display.updateCombatLog("battle is over");
-                return dfndr.hp;
+    doTurn(atkr, dfndr, op) {
+        this.winChek();
+        if (this.status === 1) {
+            if (this.p1Move === false && this.p2Move === false) {
+                this.increaseTurn();
+                this.p1Move = true;
+                this.p2Move = true;
+                return [this.p1Move, this.p2Move];
             } else {
-                const damage = atkr.atk;
-                const hpTaken = dfndr.hp - damage;
-                dfndr.hp = hpTaken;
-                Display.attack();
-                this.winCheck();
+                switch (op) {
+                    case 'atk':
+                        atkr.attack(dfndr);
+                        break;
+                    case 'heal':
+                        atkr.heal();
+                        break;
+                }
+
+                Display.updateCombatStats();
+
             }
-            this.increaseTurn();
-        }
-        Display.updateCombatStats();
-        return dfndr.hp;
-    }
-
-    //method to check if battle is over
-    winCheck(atkr = this.atkr, dfndr = this.dfndr) {
-        let win = false;
-        if (dfndr.hp <= 0) {
-            win = true;
-            Display.updateCombatLog("winner is: " + atkr.name);
-            this.status = 0;
-        } else if (atkr.hp <= 0) {
-            Display.updateCombatLog("winner is: " + dfndr.name);
-            this.status = 0;
         } else {
-            Display.updateCombatLog("Combat continues");
+            Display.updateCombatLog("Combat is over");
+            Display.hideControls(true);
         }
-        return win;
+        this.winChek();
+        Display.logScrolltoBottom();
     }
 
-    //method to reset stats once battle is over
+    winChek() {
+        if (this.p1.hp <= 0) {
+            Display.updateCombatLog(`Winner is ${this.p2.name}`);
+            Display.win();
+            Sound.playVictoryMusic();
+            this.status = 0;
+        }
+        if (this.p2.hp <= 0) {
+            Display.updateCombatLog(`Winner is ${this.p1.name}`);
+            Sound.playGameOverMusic();
+            this.status = 0;
+        }
+    }
+    //method to set player's move to  finished (false)
+    playerMoveDone() {
+        this.p2Move = false;
+        return this.p2Move;
+    }
+
+    cpuMove() {
+        let op = "atk"
+        let gamble = Math.round(Math.random());
+        if (this.p1.hp < this.p1.hpOrigin * 0.5) {
+            if (gamble === 0) {
+                op = "heal";
+            }
+        }
+        this.doTurn(ch1, ch2, op);
+        // this.p1Move = false;
+        return this.p1Move;
+    }
+
 }
 
 class Display {
-    static updateCombatStats = () => {
+    static updateCombatStats() {
         for (let i = 0; i < document.querySelectorAll(".ch").length; i++) {
             const charContainers = document.querySelectorAll(".ch");
             charContainers[i].children[1].innerHTML = `${i === 0 ? ch1.name : ch2.name}`;
@@ -109,34 +150,110 @@ class Display {
         }
     }
 
-    static updateCombatLog = (log) => {
+    static updateCombatLog(log) {
         const combatLog = document.querySelector(".combat-log");
         combatLog.value += log + "\n";
     }
 
-    static attack = () => {
+    static attack(isCrit) {
         const background = document.querySelector("body");
-        background.style.backgroundColor = "red";
+        if (isCrit === true) {
+            background.style.backgroundColor = "yellow";
+            setTimeout(() => {
+                background.style.backgroundColor = "white";
+            }, 1000);
+        } else {
+            background.style.backgroundColor = "red";
+            setTimeout(() => {
+                background.style.backgroundColor = "white";
+            }, 1000);
+        }
+    }
+
+    static heal() {
+        const background = document.querySelector("body");
+        background.style.backgroundColor = "green";
         setTimeout(() => {
             background.style.backgroundColor = "white";
-        }, 1000)
+        }, 1000);
+    }
+
+    static win() {
+        const background = document.querySelector("body");
+        background.style.backgroundColor = "blue";
+    }
+
+    static gameOver() {
+        const background = document.querySelector("body");
+        background.style.backgroundColor = "red";
+    }
+
+    static hideControls(allControls) {
+        if (allControls === true) {
+            document.querySelector("#btn-next").style.display = "none";
+        }
+        const controlsToHide = document.querySelectorAll(".hide-after-player-turn");
+        for (let i = 0; i < controlsToHide.length; i++) {
+            controlsToHide[i].style.display = "none";
+        }
+    }
+
+    static showControls() {
+        const controlsToHide = document.querySelectorAll(".hide-after-player-turn");
+        for (let i = 0; i < controlsToHide.length; i++) {
+            controlsToHide[i].style.display = "inline";
+        }
+    }
+
+    static logScrolltoBottom() {
+        const combatLog = document.querySelector(".combat-log");
+        combatLog.scrollTop = combatLog.scrollHeight;
     }
 
 }
 
-const fetching = (name, el) => {
-    fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`)
-        .then((response) => {
-            return response.json();
-        }).then((data) => {
-            const sprite = data.sprites.front_default;
-            const imgEl = document.querySelector(`.${el}`);
-            imgEl.style.height = 100;
-            imgEl.style.width = 100;
-            imgEl.src = sprite;
-        });
-    console.log("hola", document.querySelector(`.${el}`))
+class Sound {
 
+    static getAudio() {
+        return document.querySelector(".audio");
+    }
+
+    static getAudioSource() {
+        return document.querySelector(".source-audio");
+    }
+
+
+    static loadSound() {
+        this.getAudio().load();
+    }
+    static playSound() {
+        this.getAudio().play(); 
+    }
+
+    static stopSound() {
+        this.getAudio().pause();
+    }
+
+    static playBattleMusic() {
+        this.getAudioSource().src = "./resources/audio/au_fight.mp3";
+        this.loadSound();
+        this.playSound();
+        this.getAudio().loop = "true";
+    }
+
+    static playVictoryMusic() {
+        this.getAudioSource().src = "./resources/audio/au_win.mp3";
+        this.loadSound();
+        this.playSound();
+        this.getAudio().loop = "true";
+    }
+
+    static playGameOverMusic() {
+        this.getAudioSource().src = "./resources/audio/au_gameOver.mp3";
+        this.loadSound();
+        this.playSound();
+        this.getAudio().loop = "true";
+    }
 }
 
 const ch1 = new Character(0, "Abby", 30, 5, 3, 10);
@@ -154,18 +271,28 @@ btnBegin.addEventListener("click", () => {
     document.querySelector(".combat-log").style.display = "block"
     btnBegin.style.display = "none";
     Display.updateCombatStats();
-    const battleMusic = document.querySelector(".audio");
-    battleMusic.autoplay = true;
-    battleMusic.loop = true;
+    Sound.playBattleMusic();
     combat.beginCombat();
 });
 
 const btnAttack = document.getElementById("btn-attack");
 btnAttack.addEventListener("click", () => {
-    combat.doTurn();
+    const op = "atk";
+    combat.doTurn(ch2, ch1, op);
+    // combat.playerMoveDone();
+    Display.hideControls();
 });
 
 const btnHeal = document.getElementById("btn-heal");
 btnHeal.addEventListener("click", () => {
-    ch2.heal();
+    const op = "heal";
+    // combat.playerMoveDone();
+    combat.doTurn(ch2, ch1, op);
+    Display.hideControls();
 })
+
+const btnNext = document.getElementById("btn-next");
+btnNext.addEventListener("click", () => {
+    combat.cpuMove();
+    Display.showControls();
+});

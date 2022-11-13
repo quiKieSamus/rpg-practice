@@ -31,14 +31,15 @@
         </div>
 
         <div class="controls">
-            <button id="btn-attack">Atacar</button>
-            <button id="btn-heal">Curar</button>
+                <button id="btn-attack" class="hide-after-player-turn">Atacar</button>
+                <button id="btn-heal" class="hide-after-player-turn">Curar</button>
+                <button id="btn-next">Siguiente</button>
+            <textarea name="combat-log" class="combat-log" readonly id="cLog" cols="30" rows="10"></textarea>
         </div>
 
-        <textarea name="combat-log" class="combat-log" readonly id="cLog" cols="30" rows="10"></textarea>
     </div>
     <audio class="audio">
-        <source src="./resources/audio/au_fight.mp3">
+        <source class="source-audio" src="" type="audio/mpeg">
     </audio>
     <script src="./app.js"></script>
 </body>

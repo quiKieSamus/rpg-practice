@@ -2,6 +2,15 @@
     box-sizing: border-box;
 }
 
+.container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 .char-containers, .controls {
     display: none;
+}
+
+.combat-log {
+    height: 100%;
 }
