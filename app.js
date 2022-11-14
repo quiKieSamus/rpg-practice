@@ -189,7 +189,7 @@ class Display {
     static updateCombatStats() {
         for (let i = 0; i < document.querySelectorAll(".ch").length; i++) {
             const charContainers = document.querySelectorAll(".ch");
-            charContainers[i].children[1].innerHTML = `${i === 0 ? ch1.name : ch2.name}`;
+            charContainers[i].children[1].innerHTML = `${i === 0 ? ch1.name : ch2.name + " (you)"}`;
             charContainers[i].children[2].innerHTML = `${i === 0 ? ch1.hp : ch2.hp}/${i === 0 ? ch1.hpOrigin : ch2.hpOrigin}HP`;
             charContainers[i].children[3].innerHTML = `${i === 0 ? ch1.mana : ch2.mana}/${i === 0 ? ch1.manaOrigin : ch2.manaOrigin}MP`;
         }
@@ -339,6 +339,8 @@ const btnBegin = document.getElementById("btn-begin");
 btnBegin.addEventListener("click", () => {
     const containerChar = document.querySelector(".char-containers");
     const containerControls = document.querySelector(".controls");
+    const guide = document.querySelector(".guide");
+    guide.style.display = "block";
 
     containerChar.style.display = "block";
     containerControls.style.display = "block";
