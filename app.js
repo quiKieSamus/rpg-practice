@@ -276,7 +276,12 @@ class Display {
 
     static updateCombatLog(log) {
         const combatLog = document.querySelector(".combat-log");
-        combatLog.innerHTML += log + `\n\n`;
+        if (log === "") {
+            combatLog.innerHTML = log;
+        } else {
+            combatLog.innerHTML += log + `\n\n`;
+        }
+        
     }
 
     static attack(isCrit) {
@@ -391,7 +396,7 @@ class Sound {
         this.prepareAudio()
     }
 }
-
+Display.updateCombatLog("");
 const ch1 = new Character(0, "Abby", 30, 5, 3, 100, 10);
 const ch2 = new Character(1, "Ybba", 35, 6, 2, 70, 5);
 document.querySelector(".combat-log").style.display = "none"
