@@ -17,6 +17,7 @@ html, body {
     height: inherit;
     border: black 10px solid;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center; 
 }

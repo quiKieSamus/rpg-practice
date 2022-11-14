@@ -122,7 +122,7 @@ class CombatSystem {
     beginCombat() {
         this.status = 1;
         this.increaseTurn();
-        Display.updateCombatLog("Combat has begun");
+        Display.updateCombatLog("Combat has begun. Read instructions below (Scroll down)");
         return this.status;
     }
 
