@@ -62,6 +62,7 @@ class Character { /*
 
     defend() {
         this.def = this.def + (this.def * 0.5);
+        Display.updateCombatLog("Not functional yet!");
         return this.def;
     }
 
@@ -308,6 +309,18 @@ class Display {
         combatLog.scrollTop = combatLog.scrollHeight;
     }
 
+    static playerStats() {
+        // const statsContainer = document.querySelector(".stats").children;
+        // for (let i = 0; i < statsContainer.length; i++) {
+        //     statsContainer[0].innerHTML = `HP: ${ch2.hpOrigin}`
+        //     statsContainer[1].innerHTML = `Attack: ${ch2.atkOrigin}`;
+        //     statsContainer[2].innerHTML = `Defence: ${ch2.defOrigin}`;
+        //     statsContainer[3].innerHTML = `Mana: ${ch2.manaOrigin}`;
+        //     statsContainer[4].innerHTML = `Speed: ${ch2.spOrigin}`;
+        // }
+        this.updateCombatLog(`Name: ${ch2.name}, the unbothered\nHP: ${ch2.hpOrigin}\nAttack: ${ch2.atkOrigin}\nDefence: ${ch2.defOrigin}\nMana: ${ch2.manaOrigin}\nSpeed: ${ch2.spOrigin}`);
+    }
+
 }
 
 class Sound {
@@ -397,20 +410,13 @@ const btnDefend = document.getElementById("btn-defend");
 btnDefend.addEventListener("click", () => {
     const op = "def";
     combat.doTurn(ch2, ch1, op);
-    Display.hideControls();
+    // Display.hideControls();
 
 });
 
 const btnStats = document.getElementById("btn-stats");
 btnStats.addEventListener("click", () => {
-    const statsContainer = document.querySelector(".stats").children;
-    for (let i = 0; i < statsContainer.length; i++) {
-        statsContainer[0].innerHTML = `HP: ${ch2.hpOrigin}`
-        statsContainer[1].innerHTML = `Attack: ${ch2.atkOrigin}`;
-        statsContainer[2].innerHTML = `Defence: ${ch2.defOrigin}`;
-        statsContainer[3].innerHTML = `Mana: ${ch2.manaOrigin}`;
-        statsContainer[4].innerHTML = `Speed: ${ch2.spOrigin}`;
-    }
+    Display.playerStats();
 });
 
 const btnNext = document.getElementById("btn-next");
