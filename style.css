@@ -36,7 +36,6 @@ html, body {
 .container {
     display: flex;
     justify-content: space-evenly;
-    border: black 10px solid;
 }
 
 .char-containers, .controls {
@@ -46,6 +45,8 @@ html, body {
 .combat-log {
     height: 500px;
     font-size: 1rem;
+    overflow: scroll;
+    border: black solid 2px;
 }
 
 .battle-info {
@@ -90,4 +91,23 @@ html, body {
 
 .sp-stat {
     color: darkcyan;
+}
+
+.name {
+    color: darkslategray;
+    font-size: 20px;
+}
+
+.dmg {
+    color: red;
+    font-size: 20px;
+}
+
+.heal {
+    color: rgb(0, 255, 0);
+}
+
+.turns {
+    color: blue;
+    font-size: 30px;
 }

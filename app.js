@@ -14,7 +14,7 @@ class Character { /*
 
     When it comes to the methods that the character class has, we can talk about a few that might be self explanatory:
         1.- Attack method: receives the parameter of target. This method attacks a target character instance (an enemy) while in combat.
-        2.- Defend method: Increases the character defence for the next turn by 50%. Good when expecting high damage output.
+        2.- Defend method: Increases the character defence for the next turn by 100%. Good when expecting high damage output.
         3.- Heal method: Heals a charater by 30 points.
     
     The resetStatsToOrigin Method which is not completed should serve the purpose of setting each stats to its origin status (These was discussed previously in this comment).
@@ -24,7 +24,7 @@ class Character { /*
         1.- Mana or Energy Stats that avoids the overuse (spam) of special techniques such as the heal method.
 
 */
-    constructor(id, name, hp, atk, def, mana, sp) {
+    constructor(id, name, hp, atk, def, mana, sp, isPlayer) {
         this.id = id;
         this.name = name;
         this.hp = hp;
@@ -37,6 +37,7 @@ class Character { /*
         this.manaOrigin = this.mana;
         this.sp = sp;
         this.spOrigin = this.sp;
+        this.isPlayer = isPlayer;
     }
 
     attack(target) {
@@ -50,7 +51,7 @@ class Character { /*
             if (target.hp <= 0) {
                 target.hp = 0;
             }
-            Display.updateCombatLog(`IT WAS A CRITICAL HIT ${this.name}!!!! ${critHit} points of damage were dealt`);
+            Display.updateCombatLog(`IT WAS A CRITICAL HIT <span class="name">${this.name}</span>!!!! <span class="dmg">${critHit}</span> points of damage were dealt`);
             Display.attack(true);
             Display.updateBattleInfo(critHit, 'dmg');
             return critHit;
@@ -61,14 +62,14 @@ class Character { /*
             target.hp = 0;
         }
         Display.attack();
-        Display.updateCombatLog(`${this.name} attacks ${target.name} dealing ${damage} points of damage`);
+        Display.updateCombatLog(`<span class="name">${this.name}</span> attacks <span class="name">${target.name}</span> dealing <span class="dmg">${damage}</span> points of damage`);
         Display.updateBattleInfo(damage, 'dmg');
         return damage;
     }
 
     defend() {
         this.def = this.def * 2;
-        Display.updateCombatLog("With the power of the gods, you gather resilience to withstand your mighty foe's attack. Defence increased by 100% for the following opponent's attack");
+        Display.updateCombatLog(`<br>With the power of the gods, you gather resilience to <br> withstand your mighty foe's attack. <br>Defence increased by 100% for the following <br> opponent's attack`);
         return this.def;
     }
 
@@ -76,17 +77,29 @@ class Character { /*
     heal() {
         if (this.mana < 30) {
             if (this.name === "Abby") {
-                Display.updateCombatLog("I don't have enough mp, therefore I will attack you Ybba");
+                this.say(`I don't have enough <span class="mana">MP</span>, I have no choice but to attack you <span class="name">${ch2.name}</span>`);
                 this.attack(ch2);
                 return ch2.hp;
             }
-            Display.updateCombatLog(`${this.name}, you don't have enough MP for that move`);
+            Display.updateCombatLog(`<span class="name">${this.name}</span>, you don't have enough <span class="mana">MP</span> for that move`);
         } else {
             let heal = 30;
+            if (this.hp === this.hpOrigin) {
+                Display.updateCombatLog(`<span class="name">${this.name}</span>, your HP is at max`);
+                return this.hp;
+            }
+            if (this.hp + heal > this.hpOrigin) {
+                Display.updateCombatLog(`<span class="name">${this.name}</span> Healed for <span class="heal">${heal}</span> points`);
+                this.hp = this.hpOrigin;
+                this.mana -= 30;
+                Display.heal();
+                Display.updateBattleInfo(heal, 'heal');
+                return this.hp
+            }
             this.hp += heal;
             this.mana -= 30;
+            Display.updateCombatLog(`<span class="name">${this.name}</span> Healed for <span class="heal">${heal}</span> points`);  
             Display.heal();
-            Display.updateCombatLog(`${this.name} Healed for ${heal} points`);
             Display.updateBattleInfo(heal, 'heal');
         }
 
@@ -100,6 +113,10 @@ class Character { /*
     resetStatsToOrigin() {
         this.hp = ch.hpOrigin;
         return ch.hp;
+    }
+
+    say(toSay) {
+        Display.updateCombatLog(`<span class="name">${this.name}</span>: ${toSay}`);
     }
 }
 
@@ -123,7 +140,12 @@ class CombatSystem {
 
     increaseTurn() {
         this.turns++;
-        Display.updateCombatLog(`Turn(s): ${this.turns}`);
+        if (this.turns > 1) {
+            Display.updateCombatLog(`<br>Turn(s): <span class="turns">${this.turns}</span><hr>`);
+        } else {
+            Display.updateCombatLog(`Turn(s): <span class="turns">${this.turns}</span><hr>`);
+
+        }
         return this.turns;
     }
 
@@ -259,6 +281,7 @@ class Display {
         for (let i = 0; i < hp.length; i++) {
             if (ch.hp <= ch.hpOrigin * 0.5) {
                 if (ch.name !== "Ybba") {
+                    // ch.say("Really good of you to make me sweat, although this act of yours is going to end really soon");
                     hp[0].style.color = "yellow";
                 } else {
                     hp[1].style.color = "yellow";
@@ -272,12 +295,14 @@ class Display {
             }
             if (ch.hp <= ch.hpOrigin * 0.25) {
                 if (ch.name !== "Ybba") {
+                    // ch.say("Tch! No one has pushed me this far in a long while");
                     hp[0].style.color = "red";
                 } else {
                     hp[1].style.color = "red";
                 }
             }
         }
+        return ch.hp;
     }
 
     static updateCombatLog(log) {
@@ -285,7 +310,7 @@ class Display {
         if (log === "") {
             combatLog.innerHTML = log;
         } else {
-            combatLog.innerHTML += log + `\n\n`;
+            combatLog.innerHTML += `<br>${log}`;
         }
         
     }
@@ -354,7 +379,7 @@ class Display {
         //     statsContainer[3].innerHTML = `Mana: ${ch2.manaOrigin}`;
         //     statsContainer[4].innerHTML = `Speed: ${ch2.spOrigin}`;
         // }
-        this.updateCombatLog(`Name: ${ch2.name}, the unbothered\nHP: ${ch2.hpOrigin}\nAttack: ${ch2.atkOrigin}\nDefence: ${ch2.defOrigin}\nMana: ${ch2.manaOrigin}\nSpeed: ${ch2.spOrigin}`);
+        this.updateCombatLog(`Name: ${ch2.name}, the maidenless<br>HP: ${ch2.hpOrigin}<br>Attack: ${ch2.atkOrigin}<br>Defence: ${ch2.defOrigin}<br>Mana: ${ch2.manaOrigin}<br>Speed: ${ch2.spOrigin}`);
         this.logScrolltoBottom();
     }
 
@@ -403,8 +428,8 @@ class Sound {
     }
 }
 Display.updateCombatLog("");
-const ch1 = new Character(0, "Abby", 30, 5, 3, 100, 10);
-const ch2 = new Character(1, "Ybba", 35, 6, 2, 70, 5);
+const ch1 = new Character(0, "Abby", 30, 5, 3, 100, 10, false);
+const ch2 = new Character(1, "Ybba", 35, 6, 2, 70, 5, true);
 document.querySelector(".combat-log").style.display = "none"
 const combat = new CombatSystem(ch1, ch2);
 
