@@ -47,6 +47,9 @@ class Character { /*
             const critHit = damage * 3;
             damageDone = target.hp - critHit;
             target.hp = damageDone;
+            if (target.hp <= 0) {
+                target.hp = 0;
+            }
             Display.updateCombatLog(`IT WAS A CRITICAL HIT ${this.name}!!!! ${critHit} points of damage were dealt`);
             Display.attack(true);
             Display.updateBattleInfo(critHit, 'dmg');
@@ -54,6 +57,9 @@ class Character { /*
         }
         damageDone = target.hp - damage;
         target.hp = damageDone;
+        if (target.hp <= 0) {
+            target.hp = 0;
+        }
         Display.attack();
         Display.updateCombatLog(`${this.name} attacks ${target.name} dealing ${damage} points of damage`);
         Display.updateBattleInfo(damage, 'dmg');
