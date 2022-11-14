@@ -122,6 +122,7 @@ class CombatSystem {
         Display.updateCombatLog("Combat has begun");
         return this.status;
     }
+
     //method to make a turn
     doTurn(atkr, dfndr, op) {
         this.winChek();
@@ -192,6 +193,10 @@ class Display {
             charContainers[i].children[2].innerHTML = `${i === 0 ? ch1.hp : ch2.hp}/${i === 0 ? ch1.hpOrigin : ch2.hpOrigin}HP`;
             charContainers[i].children[3].innerHTML = `${i === 0 ? ch1.mana : ch2.mana}/${i === 0 ? ch1.manaOrigin : ch2.manaOrigin}MP`;
         }
+    }
+
+    combatHealth() {
+        
     }
 
     static updateCombatLog(log) {
@@ -347,10 +352,11 @@ const btnStats = document.getElementById("btn-stats");
 btnStats.addEventListener("click", () => {
     const statsContainer = document.querySelector(".stats").children;
     for (let i = 0; i < statsContainer.length; i++) {
-        statsContainer[0].innerHTML = `Attack:${ch2.atk}`;
-        statsContainer[1].innerHTML = `Defence: ${ch2.def}`;
-        statsContainer[2].innerHTML = `Mana: ${ch2.mana}`;
-        statsContainer[3].innerHTML = `Speed: ${ch2.sp}`;
+        statsContainer[0].innerHTML = `HP: ${ch2.hpOrigin}`
+        statsContainer[1].innerHTML = `Attack: ${ch2.atkOrigin}`;
+        statsContainer[2].innerHTML = `Defence: ${ch2.defOrigin}`;
+        statsContainer[3].innerHTML = `Mana: ${ch2.manaOrigin}`;
+        statsContainer[4].innerHTML = `Speed: ${ch2.spOrigin}`;
     }
 });
 

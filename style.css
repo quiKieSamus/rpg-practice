@@ -14,3 +14,35 @@
 .combat-log {
     height: 100%;
 }
+
+.ch {
+    display: grid;
+    grid-template-rows: ;
+}
+
+.hidden-info {
+    display: none;
+}
+.enemy {
+    color: darkred;
+}
+
+.atk {
+    color: red;
+}
+
+.hp {
+    color: darkgreen;
+}
+
+.def {
+    color: brown;
+}
+
+.mana {
+    color: purple;
+}
+
+.sp {
+    color: yellow;
+}
