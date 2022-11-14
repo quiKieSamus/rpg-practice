@@ -27,22 +27,22 @@
     color: darkred;
 }
 
-.atk {
+.atk-stat {
     color: red;
 }
 
-.hp {
+.hp-stat, .hp {
     color: darkgreen;
 }
 
-.def {
+.def-stat {
     color: brown;
 }
 
-.mana {
+.mana-stat, .mana {
     color: purple;
 }
 
-.sp {
+.sp-stat {
     color: yellow;
 }

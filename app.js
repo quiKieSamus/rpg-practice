@@ -193,10 +193,35 @@ class Display {
             charContainers[i].children[2].innerHTML = `${i === 0 ? ch1.hp : ch2.hp}/${i === 0 ? ch1.hpOrigin : ch2.hpOrigin}HP`;
             charContainers[i].children[3].innerHTML = `${i === 0 ? ch1.mana : ch2.mana}/${i === 0 ? ch1.manaOrigin : ch2.manaOrigin}MP`;
         }
+        this.combatHealthColors(ch1);
+        this.combatHealthColors(ch2);
     }
 
-    combatHealth() {
-        
+    static combatHealthColors(ch) {
+        const hp = document.querySelectorAll(".hp");
+        for (let i = 0; i < hp.length; i++) {
+            console.log(hp[i]);
+            if (ch.hp <= ch.hpOrigin * 0.5) {
+                if (ch.name !== "Ybba") {
+                    hp[0].style.color = "yellow";
+                } else {
+                    hp[1].style.color = "yellow";
+                }
+            } else {
+                if (ch.name !== "Ybba") {
+                    hp[0].style.color = "green";
+                } else {
+                    hp[1].style.color = "green";
+                }
+            }
+            if (ch.hp <= ch.hpOrigin * 0.25) {
+                if (ch.name !== "Ybba") {
+                    hp[0].style.color = "red";
+                } else {
+                    hp[1].style.color = "red";
+                }
+            }
+        }
     }
 
     static updateCombatLog(log) {
