@@ -4,11 +4,38 @@
 
 .guide {
     display: none;
+    max-width: 90vw;
+    margin-left: 2%;
+    text-align: justify;
+}
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+.begin {
+    height: inherit;
+    border: black 10px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+#btn-begin {
+    width: 200px;
+    height: 100px;
+    background-color: red;
+    border-radius: 4px;
+} 
+
+#btn-begin:hover {
+    border: yellow 3px solid;
 }
 
 .container {
     display: flex;
     justify-content: space-evenly;
+    border: black 10px solid;
 }
 
 .char-containers, .controls {
@@ -16,7 +43,16 @@
 }
 
 .combat-log {
-    height: 100%;
+    height: 500px;
+    font-size: 1rem;
+}
+
+.battle-info {
+    width: 100%;
+    height: auto;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
 }
 
 .ch {
@@ -33,6 +69,10 @@
 
 .atk-stat {
     color: red;
+}
+
+.player {
+    font-size: 2em;
 }
 
 .hp-stat, .hp {

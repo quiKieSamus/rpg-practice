@@ -10,8 +10,9 @@
 </head>
 
 <body>
-    <button id="btn-begin">Inicia el Combate</button>
-    <p class="guide">You're Ybba (Cloud) and you have to defeat Abby (Frisk). In order to do that you've got to take actions. If you attack, you inflict damage to frisk, you may deal critical hits (if the screen turns yellow you or your opponent did a critical hit). You may heal. Useful when you have low hp, healing consumes 30 MP. If you want to see your stats, then hit the player stats button. You can see Abby's name change color, that can tell you many things, be sure to pay attention to that. Once you have chosen what to do, hit the next button to let the battle continue. We are counting on you</p>
+    <div class="begin">
+        <button id="btn-begin">Let the battle begin</button>
+    </div>
     <div class="container">
         <div class="char-containers">
             <div class="ch" id="ch1">
@@ -22,25 +23,29 @@
                 </div>
                 <div class="mana hidden-info">
                 </div>
-            </div>
 
+            </div>
+            <div class="battle-info ch1">
+                <br>
+            </div>
             <div class="ch" id="ch2">
                 <img alt="" src="./resources/img/Ybba.webp" width="150">
                 <div class="name" class="ch2">
                 </div>
-                <div class="hp" class="ch2">
+                <div class="hp player" class="ch2">
                 </div>
                 <div class="mana">
                 </div>
+                
             </div>
         </div>
 
         <div class="controls">
-                <button id="btn-attack" class="hide-after-player-turn">Attack</button>
-                <button id="btn-heal" class="hide-after-player-turn">Heal</button>
-                <button id="btn-defend" class="hide-after-player-turn">Defend</button>
-                <button id="btn-stats" class="">Player Stats</button>
-                <button id="btn-next">Next</button>
+            <button id="btn-attack" class="hide-after-player-turn">Attack</button>
+            <button id="btn-heal" class="hide-after-player-turn">Heal</button>
+            <button id="btn-defend" class="hide-after-player-turn">Defend</button>
+            <button id="btn-stats" class="">Player Stats</button>
+            <button id="btn-next">Next</button>
             <textarea name="combat-log" class="combat-log" readonly id="cLog" cols="30" rows="10"></textarea>
         </div>
 
@@ -57,9 +62,18 @@
         <div class="sp-stat">
         </div>
     </div>
+    
     <audio class="audio">
         <source class="source-audio" src="" type="audio/mpeg">
     </audio>
+    <h1 class="guide">URGENT NOTICE!</h1>
+    <p class="guide">You're Ybba (Cloud) and you have to defeat Abby (Frisk). In order to do that you've got to take
+        actions. If you attack, you inflict damage to frisk, you may deal critical hits (if the screen turns yellow you
+        or your opponent did a critical hit). You may heal. Useful when you have low hp, healing consumes 30 MP. If you
+        want to see your stats, then hit the player stats button. You can see Abby's name change color, that can tell
+        you many things, be sure to pay attention to that. Once you have chosen what to do, hit the next button to let
+        the battle continue (you may also skip your turn for whatever reason you want to by hitting it). We are counting
+        on you</p>
     <script src="./app.js"></script>
 </body>
 

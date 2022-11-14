@@ -49,12 +49,14 @@ class Character { /*
             target.hp = damageDone;
             Display.updateCombatLog(`IT WAS A CRITICAL HIT ${this.name}!!!! ${critHit} points of damage were dealt`);
             Display.attack(true);
+            Display.updateBattleInfo(critHit, 'dmg');
             return critHit;
         }
         damageDone = target.hp - damage;
         target.hp = damageDone;
         Display.attack();
         Display.updateCombatLog(`${this.name} attacks ${target.name} dealing ${damage} points of damage`);
+        Display.updateBattleInfo(damage, 'dmg');
         return damage;
     }
 
@@ -78,6 +80,7 @@ class Character { /*
             this.mana -= 30;
             Display.heal();
             Display.updateCombatLog(`${this.name} Healed for ${heal} points`);
+            Display.updateBattleInfo(heal, 'heal');
         }
 
         return this.hp;
@@ -197,6 +200,27 @@ class Display {
         this.combatHealthColors(ch2);
     }
 
+    static updateBattleInfo(info, type) {
+        const battleInfo = document.querySelector(".battle-info");
+        switch (type) {
+            case 'dmg':
+                battleInfo.style.color = "red";
+                battleInfo.innerHTML = `<h1>-${info}</h1>`;
+                setTimeout(() => {
+                    battleInfo.innerHTML = "<br>";
+                }, 1000);
+                break;
+            case 'heal':
+                battleInfo.style.color = "green";
+                battleInfo.innerHTML = `<h1>+${info}</h1>`;
+                setTimeout(() => {
+                    battleInfo.innerHTML = "<br>";
+                }, 1000);
+                break;
+
+        }
+    }
+
     static combatHealthColors(ch) {
         const hp = document.querySelectorAll(".hp");
         for (let i = 0; i < hp.length; i++) {
@@ -226,7 +250,7 @@ class Display {
 
     static updateCombatLog(log) {
         const combatLog = document.querySelector(".combat-log");
-        combatLog.innerHTML += log + `\n`;
+        combatLog.innerHTML += log + `\n\n`;
     }
 
     static attack(isCrit) {
@@ -339,9 +363,11 @@ const btnBegin = document.getElementById("btn-begin");
 btnBegin.addEventListener("click", () => {
     const containerChar = document.querySelector(".char-containers");
     const containerControls = document.querySelector(".controls");
-    const guide = document.querySelector(".guide");
-    guide.style.display = "block";
-
+    const beginDiv = document.querySelector(".begin");
+    const guide = document.querySelectorAll(".guide");
+    guide[0].style.display = "block";
+    guide[1].style.display = "block";
+    beginDiv.style.display = "none";
     containerChar.style.display = "block";
     containerControls.style.display = "block";
     document.querySelector(".combat-log").style.display = "block"
