@@ -61,8 +61,8 @@ class Character { /*
     }
 
     defend() {
-        this.def = this.def + (this.def * 0.5);
-        Display.updateCombatLog("Not functional yet!");
+        this.def = this.def * 2;
+        Display.updateCombatLog("With the power of the gods, you gather resilience to withstand your mighty foe's attack. Defence increased by 100% for the following opponent's attack");
         return this.def;
     }
 
@@ -108,6 +108,7 @@ class CombatSystem {
         this.p1Move = true;
         this.p2Move = true;
         this.status; //0 is combat finished, 1 is combat in progress
+        this.oneTurnEffects = false; 
     }
 
     getTurns() {
@@ -140,9 +141,24 @@ class CombatSystem {
                     break;
                 case 'def':
                     atkr.defend();
+                    this.oneTurnEffects = true
                     break;
             }
+            if (atkr.name === 'Ybba') {
+                this.p2Move = false;
+            } else {
+                this.p1Move = false;
+            }
 
+            if (this.p2Move === false && this.p1Move === false) {
+                this.increaseTurn();
+                this.p2Move = true;
+                this.p1Move = true;
+                if (this.oneTurnEffects === true) {
+                    this.oneTurnEffectsReset();
+                }
+                
+            }
             Display.updateCombatStats();
 
         } else {
@@ -155,12 +171,14 @@ class CombatSystem {
 
     winChek() {
         if (this.p1.hp <= 0) {
+            Display.hideControls(true);
             Display.updateCombatLog(`Winner is ${this.p2.name}`);
             Display.win();
             Sound.playVictoryMusic();
             this.status = 0;
         }
         if (this.p2.hp <= 0) {
+            Display.hideControls(true);
             Display.updateCombatLog(`Winner is ${this.p1.name}`);
             Sound.playGameOverMusic();
             Display.updateCombatLog(`Game Over`);
@@ -184,6 +202,14 @@ class CombatSystem {
         this.doTurn(ch1, ch2, op);
         // this.p1Move = false;
         return this.p1Move;
+    }
+
+    oneTurnEffectsReset() {
+        ch1.def = ch1.defOrigin;
+        ch2.def = ch2.defOrigin;
+        Display.updateCombatLog("All one turn effects buffed stats have been restored to origin status");
+        this.oneTurnEffects = false;
+
     }
 
 }
@@ -225,7 +251,6 @@ class Display {
     static combatHealthColors(ch) {
         const hp = document.querySelectorAll(".hp");
         for (let i = 0; i < hp.length; i++) {
-            console.log(hp[i]);
             if (ch.hp <= ch.hpOrigin * 0.5) {
                 if (ch.name !== "Ybba") {
                     hp[0].style.color = "yellow";
@@ -410,7 +435,7 @@ const btnDefend = document.getElementById("btn-defend");
 btnDefend.addEventListener("click", () => {
     const op = "def";
     combat.doTurn(ch2, ch1, op);
-    // Display.hideControls();
+    Display.hideControls();
 
 });
 
