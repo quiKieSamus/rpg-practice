@@ -319,6 +319,7 @@ class Display {
         //     statsContainer[4].innerHTML = `Speed: ${ch2.spOrigin}`;
         // }
         this.updateCombatLog(`Name: ${ch2.name}, the unbothered\nHP: ${ch2.hpOrigin}\nAttack: ${ch2.atkOrigin}\nDefence: ${ch2.defOrigin}\nMana: ${ch2.manaOrigin}\nSpeed: ${ch2.spOrigin}`);
+        this.logScrolltoBottom();
     }
 
 }
@@ -333,6 +334,11 @@ class Sound {
         return document.querySelector(".source-audio");
     }
 
+    static prepareAudio() {
+        this.loadSound();
+        this.playSound();
+        this.getAudio().loop = "true";
+    }
 
     static loadSound() {
         this.getAudio().load();
@@ -347,23 +353,17 @@ class Sound {
 
     static playBattleMusic() {
         this.getAudioSource().src = "./resources/audio/au_fight.mp3";
-        this.loadSound();
-        this.playSound();
-        this.getAudio().loop = "true";
+        this.prepareAudio()
     }
 
     static playVictoryMusic() {
         this.getAudioSource().src = "./resources/audio/au_win.mp3";
-        this.loadSound();
-        this.playSound();
-        this.getAudio().loop = "true";
+        this.prepareAudio()
     }
 
     static playGameOverMusic() {
         this.getAudioSource().src = "./resources/audio/au_gameOver.mp3";
-        this.loadSound();
-        this.playSound();
-        this.getAudio().loop = "true";
+        this.prepareAudio()
     }
 }
 
